@@ -76,11 +76,12 @@ class _DismissibleState extends State<DismissiblePage>
     super.dispose();
   }
 
-  bool get _directionIsXAxis {
-    return widget.direction == DismissDirection.horizontal ||
-        widget.direction == DismissDirection.endToStart ||
-        widget.direction == DismissDirection.startToEnd;
-  }
+  // bool get _directionIsXAxis {
+  //   return widget.direction == DismissDirection.horizontal ||
+  //       widget.direction == DismissDirection.endToStart ||
+  //       widget.direction == DismissDirection.startToEnd;
+  // }
+  bool _directionIsXAxis = true;
 
   DismissDirection? _extentToDirection(double extent) {
     if (extent == 0.0) return null;
@@ -126,7 +127,23 @@ class _DismissibleState extends State<DismissiblePage>
     setState(() => _updateMoveAnimation());
   }
 
+  DragUpdateDetails _details = DragUpdateDetails(globalPosition: Offset(0, 0));
+
   void _handleDragUpdate(DragUpdateDetails details) {
+    setState(() {
+      _details = details;
+    });
+    if (details.delta.dx > 0 || details.delta.dx < 0) {
+      setState(() {
+        _directionIsXAxis = true;
+      });
+    }
+
+    if (details.delta.dy > 0 || details.delta.dy < 0) {
+      setState(() {
+        _directionIsXAxis = false;
+      });
+    }
     if (!_isActive || _moveController!.isAnimating || widget.disabled) return;
 
     final delta = details.primaryDelta;
@@ -181,7 +198,8 @@ class _DismissibleState extends State<DismissiblePage>
     if (!_isActive || _moveController!.isAnimating) return;
     if (!_moveController!.isDismissed) {
       if (_moveController!.value >
-          (widget.dismissThresholds[_dismissDirection!] ?? _kDismissThreshold)) {
+          (widget.dismissThresholds[_dismissDirection!] ??
+              _kDismissThreshold)) {
         widget.onDismiss?.call();
       } else {
         _moveController!.reverseDuration = widget.reverseDuration;
@@ -207,12 +225,12 @@ class _DismissibleState extends State<DismissiblePage>
     }
 
     return GestureDetector(
-      onHorizontalDragStart: _directionIsXAxis ? _handleDragStart : null,
-      onHorizontalDragUpdate: _directionIsXAxis ? _handleDragUpdate : null,
-      onHorizontalDragEnd: _directionIsXAxis ? _handleDragEnd : null,
-      onVerticalDragStart: _directionIsXAxis ? null : _handleDragStart,
-      onVerticalDragUpdate: _directionIsXAxis ? null : _handleDragUpdate,
-      onVerticalDragEnd: _directionIsXAxis ? null : _handleDragEnd,
+      onHorizontalDragStart: _handleDragStart,
+      onHorizontalDragUpdate: _handleDragUpdate,
+      onHorizontalDragEnd: _handleDragEnd,
+      onVerticalDragStart: _handleDragStart,
+      onVerticalDragUpdate: _handleDragUpdate,
+      onVerticalDragEnd: _handleDragEnd,
       behavior: HitTestBehavior.opaque,
       dragStartBehavior: widget.dragStartBehavior,
       child: AnimatedBuilder(
@@ -223,10 +241,14 @@ class _DismissibleState extends State<DismissiblePage>
               ? _moveAnimation.value.dx
               : _moveAnimation.value.dy;
 
-          final dx = _moveAnimation.value.dx.clamp(0, widget.maxTransformValue);
-          final dy = _moveAnimation.value.dy.clamp(0, widget.maxTransformValue);
+          final dx =
+              _moveAnimation.value.dx.clamp(0, _details.localPosition.dx);
+          final dy =
+              _moveAnimation.value.dy.clamp(0, _details.localPosition.dy);
           final scale = lerpDouble(1, widget.minScale, k);
           final radius = lerpDouble(widget.minRadius, widget.maxRadius, k)!;
+          print("dx : $dx");
+          print("dy : $dy");
 
           return Container(
             padding: contentPadding,
