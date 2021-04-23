@@ -26,8 +26,7 @@ class DismissiblePage extends StatefulWidget {
     this.onDragEnd,
     this.reverseDuration = const Duration(milliseconds: 500),
     Key? key,
-  })  : assert(dragStartBehavior != null),
-        super(key: key);
+  }) : super(key: key);
 
   final VoidCallback? onDragStart;
   final VoidCallback? onDragEnd;
@@ -96,8 +95,6 @@ class _DismissibleState extends State<DismissiblePage>
               ? DismissDirection.startToEnd
               : DismissDirection.endToStart;
       }
-      assert(false);
-      return null;
     }
     return extent > 0 ? DismissDirection.down : DismissDirection.up;
   }
@@ -247,8 +244,8 @@ class _DismissibleState extends State<DismissiblePage>
               _moveAnimation.value.dy.clamp(0, _details.localPosition.dy);
           final scale = lerpDouble(1, widget.minScale, k);
           final radius = lerpDouble(widget.minRadius, widget.maxRadius, k)!;
-          print("dx : $dx");
-          print("dy : $dy");
+          // print("dx : $dx");
+          // print("dy : $dy");
 
           return Container(
             padding: contentPadding,
