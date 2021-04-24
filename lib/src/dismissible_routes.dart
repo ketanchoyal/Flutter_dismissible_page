@@ -20,10 +20,7 @@ class TransparentRoute<T> extends PageRoute<T>
     RouteSettings? settings,
     this.maintainState = true,
     bool fullscreenDialog = true,
-  })  : assert(builder != null),
-        assert(maintainState != null),
-        assert(fullscreenDialog != null),
-        super(settings: settings, fullscreenDialog: fullscreenDialog);
+  }) : super(settings: settings, fullscreenDialog: fullscreenDialog);
 
   @override
   Duration get transitionDuration => Duration(milliseconds: 250);

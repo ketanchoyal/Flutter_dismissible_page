@@ -200,7 +200,7 @@ class _DismissibleState extends State<DismissiblePage>
         widget.onDismiss?.call();
       } else {
         _moveController!.reverseDuration = widget.reverseDuration;
-        _moveController!.reverse();
+        await _moveController!.reverse();
         widget.onDragEnd?.call();
       }
     }
@@ -249,7 +249,9 @@ class _DismissibleState extends State<DismissiblePage>
 
           return Container(
             padding: contentPadding,
-            color: widget.backgroundColor.withOpacity(1 - k),
+            color: widget.backgroundColor == Colors.transparent
+                ? widget.backgroundColor
+                : widget.backgroundColor.withOpacity(1 - k),
             child: Transform(
               alignment: Alignment.center,
               transform: Matrix4.identity()
